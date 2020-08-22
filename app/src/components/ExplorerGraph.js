@@ -67,10 +67,29 @@ export default function ExplorerGraph(props) {
   start_date = earliest_date(response.map((data) => data["start_date"]));
   end_date = latest_date(response.map((data) => data["end_date"]));
 
-  blank_value = { date: null, values: { value: null } };
   for (ticker in response) {
-    while (values[0][date] < start_date) {}
+    full_values = values;
+    while (full_values[0][date] > start_date) {
+      // full_values.unshift[{"date": full_values[0][date]-1, values:[]}]
+      // add empty values on end and beginning for all dates in array
+    }
+    while (full_values[full_values.length - 1][date] < latest_date) {
+      // full_values.push({"date": full_values[full_values.length-1]+1", values:[]})
+    }
   }
+  datasets = [];
+  for (response in reponses) {
+    var name = response["values"]["ticker"];
+    const chartType = "line";
+    for (value in response["values"]["daily"]["values"]) {
+      name = value["name"];
+    }
+  }
+  // create array of dates for labels"
+  // create dataset by mapping response
+  // datasets
+  // for value in values
+  // response.data => {"name": data.ticker, chartType = line, values = for value in values(datasets.push(name + "- " + value.name, chartType, value.values))}
   const data = {
     labels: ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug"],
 
