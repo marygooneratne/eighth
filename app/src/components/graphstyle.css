@@ -1,0 +1,14 @@
+body {
+  font-family: sans-serif;
+  /* Invert eveything */
+  filter: invert(100%);
+  /* make the background dark */
+  background-color: #000000;
+}
+/* invert all elements which needs to retain color */
+button,
+span,
+img,
+.app-icon {
+  filter: invert(100%);
+}
