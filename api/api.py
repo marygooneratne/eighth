@@ -1,8 +1,9 @@
 import time
 from flask import Flask
+from flask import request
 from models.equity import Equity
 import yfinance as yf
-
+import datetime as dt
 app = Flask(__name__)
 
 
@@ -21,8 +22,11 @@ def get_equities():
 
 @app.route('/transformations', methods=['GET'])
 def get_transformations():
-    f = open("transformations.txt", "r")
-    transformations = f.readline()
+    transformations = {}
+    with open("transformations.txt", "r") as f:
+        for line in f:
+            stripped_line = line.strip().split(':')
+            transformations.update({stripped_line[0]: stripped_line[1]})
 
     return {'name': 'Transformations', 'value': transformations}
 
@@ -56,16 +60,20 @@ def get_transformations():
 #                           }]}]}
 
 
-@app.route('/backtest', methods=['POST'])
+@app.route('/explore', methods=['POST'])
 def backtest():
     assert request.method == 'POST'
+
     json = request.get_json()
-    test_start = json['startDate']
-    test_end = json['endDate']
+    start = json['startDate'].split('-')
+    end = json['endDate'].split('-')
+    test_start = dt.date(int(start[0]), int(start[1]), int(start[2]))
+    test_end = dt.date(int(end[0]), int(end[1]), int(end[2]))
     transformations = json['transformations']
 
     values = []
     for transformation in transformations:
-        eq = Equity(test_start, test_end)
+        eq = Equity(transformation['ticker'], test_start, test_end)
+        values.append(eq.run(transformation['transformation']))
 
-    return {'name': 'Transformations', 'value': transformations}
+    return {'name': 'Transformations', 'value': values}
