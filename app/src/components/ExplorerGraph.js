@@ -99,7 +99,6 @@ export default function ExplorerGraph(props) {
         chartType: "line",
         values: [320, 320, 342, 280, 58, 12, -17, 37],
       },
-
       {
         name: "MSFT",
         chartType: "line",

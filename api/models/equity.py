@@ -15,13 +15,17 @@ class Equity:
         self.start_date = start_date
         self.end_date = end_date
         self.pull_data(start_date, end_date, verbose)
-        # Make mask of all days after start_date and take len to find where to start to trim all return vals
 
         print(self.daily.head())
         temp = self.daily.loc[self.start_date:]
         self.start_index = len(temp)
 
         print(self.start_index)
+
+    def run(self, transformation='close', args=[]):
+
+        function = 'self.' + transformation + '(' + ','.join(args) + ')'
+        return eval(function)
 
     def pull_data(self, start_date, end_date, verbose=False):
 
@@ -30,6 +34,46 @@ class Equity:
         # download dataframe
         self.daily = pdr.get_data_yahoo(
             self.ticker, start=str(adj_start_date), end=str(end_date))
+
+    def close(self, verbose=False):
+
+        closes = {}
+
+        for index, row in self.daily[-1*(self.start_index):]['Close'].items():
+            date = index.strftime("%Y-%m-%d")
+
+            closes.update({date: [{'Close': row}]})
+        return closes
+
+    def open(self, verbose=False):
+
+        opens = {}
+
+        for index, row in self.daily[-1*(self.start_index):]['Open'].items():
+            date = index.strftime("%Y-%m-%d")
+
+            opens.update({date: [{'Open': row}]})
+        return opens
+
+    def high(self, verbose=False):
+
+        highs = {}
+
+        for index, row in self.daily[-1*(self.start_index):]['High'].items():
+            date = index.strftime("%Y-%m-%d")
+
+            highs.update({date: [{'High': row}]})
+        return highs
+
+    def low(self, verbose=False):
+
+        lows = {}
+
+        for index, row in self.daily[-1*(self.start_index):]['Low'].items():
+            date = index.strftime("%Y-%m-%d")
+
+            lows.update({date: [{'Low': row}]})
+        return lows
 
     def get_price(self, date, type='c', verbose=False):
         if verbose:
@@ -66,9 +110,15 @@ class Equity:
         avg = (self.daily['Open'] + self.daily['High'] +
                self.daily['Low'] + self.daily['Close']) / 4
 
-        return avg[-1*(self.start_index):]
+        avgs = {}
+        for index, row in avg[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-    def typical_prices(self, verbose=False):
+            avgs.update({date: [{'Open-High-Low-Close': row}]})
+
+        return avgs
+
+    def tp(self, verbose=False):
         """The 'Typical Prices' of the equity, or the average of the high,low, and close
 
         Returns:
@@ -76,10 +126,15 @@ class Equity:
         """
         tps = (self.daily['High'] + self.daily['Low'] +
                self.daily['Close']) / 3
+        tp = {}
+        for index, row in tps[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-        return tps[-1*(self.start_index):]
+            tp.update({date: [{'Typical Prices': row}]})
 
-    def balance_of_power(self, verbose=False):
+        return tp
+
+    def bop(self, verbose=False):
         """The balance of the power is a metric for
          determining the variability in the opens/closes versus
          highs/lows
@@ -90,10 +145,15 @@ class Equity:
 
         bop = (self.daily['Close'] - self.daily['Open']) / \
             (self.daily['High'] - self.daily['Low'])
+        bops = {}
+        for index, row in bop[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-        return bop[-1*(self.start_index):]
+            avgs.update({date: [{'Balance of Power': row}]})
 
-    def bollinger_bands(self, period=20, stds=2, verbose=False):
+        return bops
+
+    def bollinger(self, period=20, stds=2, verbose=False):
         """[The Bolinger Bands is essentially a confidence interval of 
         stds Deviations where the price should be based on the last 
         period periods of prices]
@@ -113,10 +173,17 @@ class Equity:
 
         bolu = np.array([ma[i] + stds * std[i] for i in range(len(ma))])
         bold = np.array([ma[i] + stds * std[i] for i in range(len(ma))])
+        bols = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-        return bolu[-1*(self.start_index):], bold[-1*(self.start_index):]
+            bols.update({date: [{'Upper Bollinger': bolu[i - self.start_index]},
+                                {'Lower Bollinger': bold[i - self.start_index]}]})
+            i = i + 1
+        return bols
 
-    def accumulative_swing_index(self, verbose=False):
+    def asi(self, verbose=False):
         """[ASI is a way of looking at the prices of the equity
         in order to get information regarding momentum and market
         conditions]
@@ -148,9 +215,17 @@ class Equity:
             body = num / r
 
             asi[i] = 50 * body * kt
-        return asi[-1*(self.start_index):]
+        asis = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-    def gop_range_index(self, period=10, verbose=False):
+            asis.update(
+                {date: [{'Accumulative Swing Index': asi[i - self.start_index]}]})
+            i = i + 1
+        return asis
+
+    def gopri(self, period=10, verbose=False):
         """The GOP looks at the largest swing in prices over the
         last period periods.
 
@@ -170,10 +245,15 @@ class Equity:
             lowest = np.min(self.daily['Low'][i:i - period])
             price_range = highest - lowest
             gop[i] = math.log(price_range) / math.log(period)
+        gops = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-        return gop[-1*(self.start_index):]
+            gops.update({date: [{'GOP': gop[i - self.start_index]}]})
+        return gops
 
-    def pivot_points(self, verbose=False):
+    def pivots(self, verbose=False):
         """[Pivot poits are the centers of recent price movement]
 
         Returns:
@@ -199,10 +279,18 @@ class Equity:
             r2s[i] = r2
             s1s[i] = s1
             s2s[i] = s2
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
 
-        return pivots[-1*(self.start_index):], r1s[-1*(self.start_index):], r2s[-1*(self.start_index):], s1s[-1*(self.start_index):], s2s[-1*(self.start_index):]
+            points.update({date: [{'Pivot Point': pivots[i - self.start_index]}, {'Resistance One': r1s[i - self.start_index]}, {
+                          'Resistance Two': r2s[i - self.start_index]}, {'Support One': s1s[i - self.start_index]}, {'Support Two': s2s[i - self.start_index]}]})
+            i = i + 1
 
-    def pivot_indicator(self, verbose=False):
+        return points
+
+    def pivot_ind(self, verbose=False):
         """[Gets the spread between closing prices and the pivot points
         for a given day]
 
@@ -213,52 +301,125 @@ class Equity:
 
         ind = np.zeros((len(pivots),))
         for i in range(len(pivots)):
-            ind[i] = self.closes[i] - pivots[i]
+            ind[i] = self.daily['Close'][i] - pivots[i]
+        points = {}
 
-        return ind[-1*(self.start_index):]
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].items():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Pivot Indicator': ind[i - self.start_index]}]})
+            i = i+1
+        return points
 
     def sma(self, period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         ma = Indicators.sma(prices=prices, period=period)
-        return ma[:-1*(self.start_index)]
+        smas = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            smas.update(
+                {date: [{'Simple Moving Average': ma[i - self.start_index]}]})
+            i = i+1
+        return smas
 
     def ema(self, period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         ma = Indicators.ema(prices=prices, period=period)
-        return ma[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Exponential Moving Average': ma[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def wilder(self, period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         ma = Indicators.ema(
             prices=prices, period=period, type='wilder')
-        return ma[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Wilder Moving Average': ma[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def macd(self, slow_period=18, fast_period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         macd = Indicators.macd(prices, slow_period, fast_period)
-        return macd[-1*(self.start_index):]
 
-    def calc_moves(self, period=1, prices='c', verbose=False):
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Moving Average Convergence Divergence': macd[i - self.start_index]}]})
+            i = i + 1
+
+        return points
+
+    def moves(self, period=1, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         moves = Indicators.calc_moves(prices, period)
-        return moves[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update({date: [{'Move': moves[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def rsi(self, period=20, prices='c', type='ema', verbose=False):
         prices = self.convert_price_type(prices)
         rsi = Indicators.rsi(prices, period, type)
-        return rsi[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Relative Strength Index': rsi[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def up_down(self, period=1, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
-        up_down = Indicators.calc_up_down(prices, period)
-        return up_down[-1*(self.start_index):]
+        up, down = Indicators.calc_up_down(prices, period)
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def macd_indicator(self, slow_period=18, fast_period=9, prices='c', verbose=False):
+            points.update(
+                {date: [{'Up Move': up[i - self.start_index]}, {'Down Move': down[i-self.start_index]}]})
+            i = i + 1
+        return point
+
+    def macd_ind(self, slow_period=18, fast_period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         ind = Indicators.macd_indicator(prices, slow_period, fast_period)
-        return ind[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def average_true_range(self, period=10, verbose=False):
+            points.update(
+                {date: [{'MACD Indicator': ind[i - self.start_index]}]})
+            i = i + 1
+        return points
+
+    def atr(self, period=10, verbose=False):
         true_ranges = np.zeros((len(self.daily['Close']),))
         for i, close in enumerate(self.daily['Close']):
             if i - 1 < 0:
@@ -269,40 +430,94 @@ class Equity:
             true_ranges[i] = np.max(
                 [high - low, np.abs(high - cp), np.abs(low - cp)])
         avg_tr = Indicators.calc_average_true_range(true_ranges, period)
-        return avg_tr[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Average True Range': avg_tr[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def kst(self, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         kst = Indicators.kst(prices)
-        return kst[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def kst_trix_indicator(self, prices='c', verbose=False):
+            points.update(
+                {date: [{'Know Sure Thing': kst[i - self.start_index]}]})
+            i = i + 1
+        return points
+
+    def kti(self, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         kst_ind = kst_trix_indicator(prices)
-        return kst_ind[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'KST Indicator': kst_ind[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def calc_std(self, period=9, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         stds = Indicators.calc_std(prices, period)
-        return stds[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def trix(self, prices, verbose=False):
+            points.update({date: [{'Volatility': stds[i - self.start_index]}]})
+            i = i + 1
+        return points
+
+    def trix(self, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         trix = Indicators.trix(prices)
 
-        return trix[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def trix_indicator(self, prices, verbose=False):
+            points.update({date: [{'TRIX': trix[i - self.start_index]}]})
+            i = i + 1
+        return points
+
+    def trix_ind(self, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         trix = Indicators.trix_indicator(prices)
 
-        return trix[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
 
-    def prings_know_sure_thing(self, prices, verbose=False):
+            points.update(
+                {date: [{'TRIX Indicator': trix[i - self.start_index]}]})
+            i = i + 1
+        return points
+
+    def pkst(self, prices='c', verbose=False):
         prices = self.convert_price_type(prices)
         pkst = Indicators.prings_know_sure_thing(prices)
 
-        return pkst[-1*(self.start_index):]
+        points = {}
+        i = 0
+        for index, row in self.daily[-1*(self.start_index):].iterrows():
+            date = index.strftime("%Y-%m-%d")
+
+            points.update(
+                {date: [{'Prings Know Sure Thing': pkst[i - self.start_index]}]})
+            i = i + 1
+        return points
 
     def convert_price_type(self, prices, verbose=False):
         if prices == 'c':
