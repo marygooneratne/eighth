@@ -10,7 +10,7 @@ const tailLayout = {
 
 const Demo = () => {
   const onFinish = (values) => {
-    console.log("Success:", values);
+    console.log("Received values of form: ", values);
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -22,28 +22,11 @@ const Demo = () => {
       {...layout}
       name="basic"
       initialValues={{ remember: true }}
-      onFinish={onFinish}
+      onSubmit={onFinish}
       onFinishFailed={onFinishFailed}
     >
       <Form.Item label="DatePicker">
         <DatePicker />
-      </Form.Item>
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
       </Form.Item>
 
       <Form.Item label="Select">

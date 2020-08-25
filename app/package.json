@@ -8,8 +8,11 @@
     "@testing-library/user-event": "^7.1.2",
     "all": "^0.0.0",
     "antd": "^4.5.4",
+    "axios": "^0.20.0",
+    "cors": "^2.8.5",
     "frappe-charts": "^1.5.2",
     "react": "^16.13.1",
+    "react-async": "^10.0.1",
     "react-dom": "^16.13.1",
     "react-frappe-charts": "^4.0.0",
     "react-scripts": "3.4.3"

@@ -1,7 +1,7 @@
 import React, { Image } from "react";
 import logo from "./logo.svg";
 import { ExplorerForm } from "./components/ExplorerForm";
-import ExplorerGraph from "./components/ExplorerGraph";
+// import ExplorerGraph from "./components/ExplorerGraph";
 import greenblack from "./resources/greenblack.png";
 
 function App() {
@@ -36,9 +36,9 @@ function App() {
               width: "100%",
             }}
           >
-            <div style={{ width: "50%" }}>
+            {/* <div style={{ width: "50%" }}>
               <ExplorerGraph />
-            </div>
+            </div> */}
             <div style={{ width: "50%" }}>
               <ExplorerForm />
             </div>
