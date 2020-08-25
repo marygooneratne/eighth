@@ -4,7 +4,10 @@ from flask import request
 from models.equity import Equity
 import yfinance as yf
 import datetime as dt
+
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/time')
@@ -62,9 +65,11 @@ def get_transformations():
 
 @app.route('/explore', methods=['POST'])
 def backtest():
+
     assert request.method == 'POST'
 
-    json = request.get_json()
+    json = request.get_json(force=True)
+    print(json)
     start = json['startDate'].split('-')
     end = json['endDate'].split('-')
     test_start = dt.date(int(start[0]), int(start[1]), int(start[2]))
@@ -75,5 +80,5 @@ def backtest():
     for transformation in transformations:
         eq = Equity(transformation['ticker'], test_start, test_end)
         values.append(eq.run(transformation['transformation']))
-
+    print(values)
     return {'name': 'Transformations', 'value': values}
