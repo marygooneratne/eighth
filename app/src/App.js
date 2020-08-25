@@ -1,9 +1,9 @@
 import React, { Image } from "react";
 import logo from "./logo.svg";
 import { ExplorerForm } from "./components/ExplorerForm";
-import ExplorerGraph from "./components/ExplorerGraph";
-import greenblack from "./resources/greenblack.png";
-
+import { ExplorerGraph } from "./components/ExplorerGraph";
+import greenblack from "./resources/greenblack.svg";
+import "./App.css";
 function App() {
   return (
     <div
@@ -25,6 +25,8 @@ function App() {
             style={{
               width: "100%",
               display: "flex",
+              height: "10vh",
+              margin: "1vw",
             }}
           >
             <img src={greenblack} />
@@ -32,15 +34,36 @@ function App() {
           <div
             style={{
               display: "flex",
-              flexDirection: "row",
-              width: "100%",
+              flexDirection: "column",
+              backgroundColor: "#25282A",
+              margin: "1vw",
+
+              padding: "30px",
+              height: "90vh",
             }}
           >
-            <div style={{ width: "50%" }}>
-              <ExplorerGraph />
-            </div>
-            <div style={{ width: "50%" }}>
-              <ExplorerForm />
+            <h3
+              style={{
+                color: "white",
+                fontFamily: "Work Sans, sans-serif",
+                fontSize: "50px",
+              }}
+            >
+              EXPLORER
+            </h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+              }}
+            >
+              <div style={{ width: "65vw" }}>
+                <ExplorerGraph />
+              </div>
+              <div style={{ width: "25vw" }}>
+                <ExplorerForm />
+              </div>
             </div>
           </div>
         </div>

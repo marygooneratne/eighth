@@ -9,50 +9,57 @@ export const ExplorerForm = () => {
   const onFormLayoutChange = ({ size }) => {
     setComponentSize(size);
   };
+  const { RangePicker } = DatePicker;
 
   return (
-    <Form
-      labelCol={{
-        span: 4,
-      }}
-      wrapperCol={{
-        span: 14,
-      }}
-      layout="horizontal"
-      initialValues={{
-        size: componentSize,
-      }}
-      onValuesChange={onFormLayoutChange}
-      size={componentSize}
-    >
-      <Form.Item label="DatePicker">
-        <DatePicker />
+    <Form layout="horizontal" onValuesChange={onFormLayoutChange}>
+      <Form.Item>
+        <RangePicker style={{ width: "100%" }} />
       </Form.Item>
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Form.Item>
+          <Select placeholder="Select a transformation">
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
 
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
+        <Form.Item>
+          <Select placeholder="Select an equity">
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+          flex: 1,
+        }}
+      >
+        <Form.Item>
+          <Select placeholder="Select a transformation" style={{ flex: 1 }}>
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
 
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="Button">
-        <Button>Button</Button>
+        <Form.Item>
+          <Select placeholder="Select an equity" style={{ flex: 1 }}>
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+      </div>
+      <Form.Item>
+        <Button style={{ backgroundColor: "#B3DE74", width: "100%" }}>
+          Explore relationship
+        </Button>
       </Form.Item>
     </Form>
   );
