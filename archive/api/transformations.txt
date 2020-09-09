@@ -1,0 +1,27 @@
+Open:open
+Low:low
+High:high
+Close:close
+Simple Moving Average:sma
+Exponential Moving Average:ema
+Wilder Moving Average:wilder
+Relative Strength Index:rsi
+Open-High-Low-Close:ohlc
+Typical Prices:tp
+Balance of Power:bop
+Bollinger Bands:bollinger
+Accumulative Swing Index:asi
+GOP Range Index:gopri
+Pivot Points:pivots
+Pivot Indicator:pivot_ind
+MACD:macd
+Moves:moves
+Up-Down:up_down
+MACD Indicator:macd_ind
+Average True Range:atr
+KST:kst
+KST-Trix Indicator:ksti
+Volatility:calc_std
+TRIX:trix
+TRIX Indicator:trix_ind
+Prings Know Sure Thing:pkst
