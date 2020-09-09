@@ -1,110 +1,150 @@
 import { Chart } from "frappe-charts/dist/frappe-charts.esm.js";
 import "frappe-charts/dist/frappe-charts.min.css";
 import React, { useState } from "react";
-
-//import "graphstyle.css";
 import ReactFrappeChart from "react-frappe-charts";
 
-const X_AXIS_OPTIONS = { daily: [], weekly: [], monthly: [], yearly: [] };
-const YEAR_DAYS = 365;
-const WEEK_DAYS = 7;
-const MONTH_DAYS = 30;
+var get_dates_before = function (fullArray, stopDate) {
+  var dateArray = [];
+  var dateIndex = 0;
+  while (fullArray[dateIndex] < stopDate && !(dateIndex > fullArray.length)) {
+    dateArray.push(fullArray[dateIndex]);
+    dateIndex++;
+  }
+  return dateArray;
+};
 
-var date_diff_indays = function (date1, date2) {
-  dt1 = new Date(date1);
-  dt2 = new Date(date2);
-  return Math.floor(
-    (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
-      Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
-      (1000 * 60 * 60 * 24)
+var get_dates_after = function (fullArray, stopDate) {
+  var dateArray = [];
+  var dateIndex = fullArray.length - 1;
+  while (fullArray[dateIndex] > stopDate && dateIndex >= 0) {
+    dateArray.push(fullArray[dateIndex]);
+    dateIndex--;
+  }
+  return dateArray;
+};
+
+var parse_response = function (resp) {
+  var change_transform = function (org) {
+    var changed = org["values"];
+    for (var i = 0; i < changed.length; i++) {
+      changed[i]["date"] = new Date(changed[i]["date"] + "T00:00:00");
+    }
+    org["values"] = changed;
+    return org;
+  };
+
+  var parsed = JSON.parse(resp);
+  parsed[0]["value"] = new Date(parsed[0]["value"] + "T00:00:00");
+  parsed[1]["value"] = new Date(parsed[1]["value"] + "T00:00:00");
+
+  var parsed_transforms = parsed[2]["value"];
+  parsed_transforms = parsed_transforms.map((transform) =>
+    change_transform(transform)
   );
-};
-var earliest_date = function (dates) {
-  if (dates.length == 0) return null;
-  var earliestDate = dates[0];
-  for (var i = 1; i < dates.length; i++) {
-    var currentDate = dates[i];
-    if (currentDate < earliestDate) {
-      earliestDate = currentDate;
-    }
-  }
-  return earliestDate;
+  parsed[2]["value"] = parsed_transforms;
+
+  return parsed;
 };
 
-var latest_date = function (dates) {
-  if (dates.length == 0) return null;
-  var latest_date = dates[0];
-  for (var i = 1; i < dates.length; i++) {
-    var currentDate = dates[i];
-    if (currentDate > latest_date) {
-      latest_date = currentDate;
-    }
-  }
-  return latest_date;
+var create_blank_dict = function (key) {
+  var blank = {};
+  blank[key] = null;
+  return blank;
 };
-export default function ExplorerGraph(props) {
-  /**   {
-        {'name': 'ticker', 'value': 'APPL'},
-        {'name': 'daily', 'value': [[
-            {'name': 'date', 'value': 2020-08-20},
-            {'name': 'open', 'value': 390.07},
-            {'name': 'close', 'value': 392.07},
-            {'name': 'high', 'value': 392.09},
-            {'name': 'low', 'value': 388.17},
-            {'name': 'volume', 'value': 3423420}
-            ],
-            [
-            {'name': 'date', 'value': 2020-08-21},
-            {'name': 'open', 'value': 390.07},
-            {'name': 'close', 'value': 392.07},
-            {'name': 'high', 'value': 392.09},
-            {'name': 'low', 'value': 388.17},
-            {'name': 'volume', 'value': 3423420}
-            ]
+
+export const ExplorerGraph = () => {
+  const json =
+    '[{"name": "start_date", "value":"2020-01-01"},{"name": "end_date", "value":"2020-01-04"}, {"name": "Transformations", "value": [{"ticker": "AAPL","transformation": "Close","values":[{"date":"2020-01-01","values":[{"Close": 345.45}]},{"date":"2020-01-02","values":[{"Close": 325.45}]}]},{"ticker": "AAPL","transformation": "Pivot Points", "values":[{"date":"2020-01-03","values":[{"Pivot": 31.45},{"Resistance 1": 103.71}, {"Resistance 2": 217.71},{"Support 1": 643.71},{"Support 2": 941.71}]},{"date": "2020-01-04","values":[{"Pivot": 45.45},{"Resistance 1": 446.71},{"Resistance 2": 592.71},{"Support 1": 43.71},{"Support 2": 211.71}]}]}]}]';
+  // Parse and label parts of response
+  var response = parse_response(json);
+  var t = response[2];
+  var t_values = t["value"];
+  var start_date = response[0]["value"];
+  var end_date = response[1]["value"];
+  // Find transform with << start date and >>> end date
+  var correct_start = t_values.filter(
+    (transform) =>
+      transform["values"][0]["date"].getTime() == start_date.getTime()
+  )[0];
+  var correct_end = t_values.filter(
+    (transform) =>
+      transform["values"][transform["values"].length - 1]["date"].getTime() ==
+      end_date.getTime()
+  )[0];
+  // create array of dates from earliest start and array of dates from latest start
+  var start_array = correct_start["values"].map((data) => data["date"]);
+  var end_array = correct_end["values"].map((data) => data["date"]);
+
+  // iterate through transforms and add empty dates to create consistent length
+  for (var i = 0; i < t_values.length; i++) {
+    console.log(i);
+    var full_values = t_values[i]["values"];
+    var prepend_dates = get_dates_before(start_array, full_values[0]["date"]);
+
+    var blank_vals = [];
+    full_values[0]["values"].map((val) =>
+      blank_vals.push(create_blank_dict(Object.keys(val)[0]))
+    );
+    for (var date_key = prepend_dates.length - 1; date_key >= 0; date_key--) {
+      var entry = { date: prepend_dates[date_key], values: blank_vals };
+      full_values.unshift(entry);
+    }
+    var append_dates = get_dates_after(
+      end_array,
+      full_values[full_values.length - 1]["date"]
+    );
+    for (var date_key = append_dates.length - 1; date_key >= 0; date_key--) {
+      var entry = { date: append_dates[date_key], values: blank_vals };
+      full_values.push(entry);
+    }
+    console.log(full_values);
+    t_values[i]["values"] = full_values; //can u change array in for each loop
+  }
+  response[2]["value"] = t_values;
+  //split
+  // Create full date array
+
+  var full_dates = response[2]["value"][0]["values"].map(
+    (full) => full["date"]
+  );
+  var dataset_dictionary = {};
+  // {"ticker": "AAPL","transformation": "Pivot Points", "values":[{"date":"01-03-2020","values":[{"Pivot": 345.45},{"Resistance 1": 346.71},
+
+  // // Create dataset of values for each transform and subtransform
+  for (var transform_index in response[2]["value"]) {
+    var transform = response[2]["value"][transform_index];
+    const ticker = transform["ticker"];
+    const transform_name = transform["transformation"];
+    for (var day_index in transform["values"]) {
+      var day = transform["values"][day_index];
+      for (var value_index in day["values"]) {
+        var value = day["values"][value_index];
+        var value_name = Object.keys(value)[0];
+        var dataset_name =
+          ticker + " (" + transform_name + ")" + " — " + value_name;
+        if (!Object.keys(dataset_dictionary).includes(dataset_name)) {
+          dataset_dictionary[dataset_name] = [];
         }
-        ]
-    }*/
-  start_date = earliest_date(response.map((data) => data["start_date"]));
-  end_date = latest_date(response.map((data) => data["end_date"]));
+        dataset_dictionary[dataset_name].push(value[value_name]);
+      }
+    }
+  }
+  // Convert dictionary into dataset
+  var datasets = [];
+  Object.keys(dataset_dictionary).forEach(function (key) {
+    datasets.push({
+      name: key,
+      chartType: "line",
+      values: dataset_dictionary[key],
+    });
+  });
+  console.log(dataset_dictionary);
+  console.log(datasets);
 
-  for (ticker in response) {
-    full_values = values;
-    while (full_values[0][date] > start_date) {
-      // full_values.unshift[{"date": full_values[0][date]-1, values:[]}]
-      // add empty values on end and beginning for all dates in array
-    }
-    while (full_values[full_values.length - 1][date] < latest_date) {
-      // full_values.push({"date": full_values[full_values.length-1]+1", values:[]})
-    }
-  }
-  datasets = [];
-  for (response in reponses) {
-    var name = response["values"]["ticker"];
-    const chartType = "line";
-    for (value in response["values"]["daily"]["values"]) {
-      name = value["name"];
-    }
-  }
-  // create array of dates for labels"
-  // create dataset by mapping response
-  // datasets
-  // for value in values
-  // response.data => {"name": data.ticker, chartType = line, values = for value in values(datasets.push(name + "- " + value.name, chartType, value.values))}
   const data = {
-    labels: ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug"],
+    labels: full_dates,
 
-    datasets: [
-      {
-        name: "APPL",
-        chartType: "line",
-        values: [320, 320, 342, 280, 58, 12, -17, 37],
-      },
-      {
-        name: "MSFT",
-        chartType: "line",
-        values: [134, 120, 133, 156, 180, 200, 217, 237],
-      },
-    ],
+    datasets: datasets,
 
     yMarkers: [{ label: "High", value: 60, options: { labelPos: "left" } }],
   };
@@ -114,7 +154,14 @@ export default function ExplorerGraph(props) {
       title="APPL vs. MACD(MSFT)"
       type="axis-mixed"
       height="600"
-      colors={["#25282A", "#492083", "light-blue"]}
+      colors={[
+        "#25282A",
+        "#CB98FF",
+        "#FFFFFF",
+        "#60B200",
+        "#D5FFA5",
+        "#760AFF",
+      ]}
       axisOptions={{
         xAxisMode: "tick",
         xIsSeries: true,
@@ -129,4 +176,4 @@ export default function ExplorerGraph(props) {
       }}
     />
   );
-}
+};

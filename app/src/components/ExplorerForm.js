@@ -58,45 +58,56 @@ export const ExplorerForm = () => {
   const onFormLayoutChange = ({ size }) => {
     setState({ size: size });
   };
+  const { RangePicker } = DatePicker;
 
   return (
-    <Form
-      labelCol={{
-        span: 4,
-      }}
-      wrapperCol={{
-        span: 14,
-      }}
-      layout="horizontal"
-      initialValues={{
-        size: state.size,
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      onValuesChange={onFormLayoutChange}
-      size={state.size}
-    >
-      <Form.Item name="startDate" label="DatePicker">
-        <DatePicker />
+    <Form layout="horizontal" onValuesChange={onFormLayoutChange}>
+      <Form.Item>
+        <RangePicker style={{ width: "100%" }} />
       </Form.Item>
-      <Form.Item name="endDate" label="DatePicker">
-        <DatePicker />
-      </Form.Item>
-      <Form.Item name="ticker" label="Select">
-        <Select>
-          <Select.Option value="AAPL">AAPL</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item name="transformation" label="Select">
-        <Select>
-          <Select.Option value="sma">Simple Moving Average</Select.Option>
-        </Select>
-      </Form.Item>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Form.Item name="transformation">
+          <Select placeholder="Select a transformation">
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
 
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
+        <Form.Item name="equity">
+          <Select placeholder="Select an equity">
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+          flex: 1,
+        }}
+      >
+        <Form.Item name="transformation">
+          <Select placeholder="Select a transformation" style={{ flex: 1 }}>
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item name="equity">
+          <Select placeholder="Select an equity" style={{ flex: 1 }}>
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+      </div>
+      <Form.Item>
+        <Button style={{ backgroundColor: "#B3DE74", width: "100%" }}>
+          Explore relationship
         </Button>
       </Form.Item>
       <p>{state.data}</p>
