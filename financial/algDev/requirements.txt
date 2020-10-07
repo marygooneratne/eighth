@@ -1,0 +1,9 @@
+tensorflow
+pandas
+matplotlib
+numpy
+keras
+gensim
+sklearn
+psycopg2
+openpyxl

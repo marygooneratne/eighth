@@ -1,0 +1,25 @@
+# Typescript specific
+*environment.ts
+
+# Mac specific
+*.DS_Store
+
+# Virtual environment
+venv/
+
+# Editor specific
+.idea/
+.vscode/
+
+# Python specific
+__pycache__/
+*.pyc
+*.ipynb_checkpoints
+build/
+dist/
+*.egg-info
+
+*/node_modules
+
+*credentials.py
+*cloud_sql_proxy
