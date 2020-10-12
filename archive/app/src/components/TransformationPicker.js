@@ -22,7 +22,6 @@ function TransformationPicker() {
   return (
     <Select
       showSearch
-      style={{ width: 200 }}
       placeholder="Select a person"
       optionFilterProp="children"
       onChange={onChange}

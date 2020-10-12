@@ -5,19 +5,17 @@ import "antd/dist/antd.css";
 
 function SelectedCards(props) {
   var selected = {};
-  let cards = props.cards;
+  let cards = props.data;
   for (var i = 0; i < cards.length; i++) {
     var line = cards[i];
     var key = line.key;
-    if (key.includes("move")) {
-      let splits = key.split("-");
-      let root = splits[0];
-      //   let label = splits[2] + " change over " + splits[3] + " days";
-      let label = "Significant Moves";
-      selected[root].push(label);
-    } else {
-      selected[key] = ["Closing Price"];
+    console.log("key", key);
+    var root = key.split("-")[0];
+    var child = String(key.split("-").slice(1));
+    if (!Object.keys(selected).includes(root)) {
+      selected[root] = [];
     }
+    selected[root].push(child);
   }
   let selected_keys = Object.keys(selected);
   return (
@@ -30,7 +28,7 @@ function SelectedCards(props) {
     >
       {selected_keys.map((key) => {
         return (
-          <Card size="small" title={key} style={{ width: 300 }}>
+          <Card size="small" title={key}>
             {selected[key].map((val) => {
               return <p>{val}</p>;
             })}

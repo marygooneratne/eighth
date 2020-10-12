@@ -7,7 +7,12 @@ const { Header, Content, Footer } = Layout;
 function App() {
   return (
     <div>
-      <Layout className="layout">
+      <Layout
+        className="layout"
+        style={{
+          height: "100vh",
+        }}
+      >
         <Header>
           <div className="logo" />
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["2"]}>
@@ -18,7 +23,7 @@ function App() {
           <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>Explorer</Breadcrumb.Item>
           </Breadcrumb>
-          <div className="site-layout-content">
+          <div className="site-layout-content" style={{ height: "100%" }}>
             <Explorer />
           </div>
         </Content>

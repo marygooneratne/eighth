@@ -6,41 +6,18 @@ import {
   ChartRow,
   YAxis,
   LineChart,
+  Resizable,
 } from "react-timeseries-charts";
 import { useState } from "react";
 import { format } from "d3-format";
-function ExplorerChart(props) {
-  const initState = {
-    tracker: null,
-    timerange: props.data.range(),
-    x: null,
-    y: null,
-  };
-  const [state, setState] = useState(initState);
-  const handleTrackerChanged = (tracker) => {
-    let copy = state;
-    if (!tracker) {
-      copy.x = null;
-      copy.y = null;
-      copy.tracker = tracker;
-      setState(copy);
-    } else {
-      copy.tracker = tracker;
-      setState(copy);
-    }
-  };
-  const handleTimeRangeChange = (timerange) => {
-    let copy = state;
-    copy.timerange = timerange;
-    setState(copy);
-  };
+import moment from "moment";
 
-  const handleMouseMove = (x, y) => {
-    let copy = state;
-    copy.x = x;
-    copy.y = y;
-    setState(copy);
-  };
+function ExplorerChart(props) {
+  console.log("data", JSON.stringify(props.data));
+  const [tracker, setTracker] = useState(0);
+  const [trackerX, setTrackerX] = useState(0);
+  const [trackerEventIn, setTrackerEventIn] = useState(0);
+  const [timeRange, setTimeRange] = useState(0);
   const getMax = (data) => {
     let max = 0;
     for (let c = 0; c < data.columns().length; c++) {
@@ -49,6 +26,21 @@ function ExplorerChart(props) {
       if (cur > max) max = cur;
     }
     return max;
+  };
+
+  const getTrackerValues = (time) => {
+    if (props.data.collection().eventList() != null) {
+      console.log(JSON.stringify(props.data.collection().eventList()));
+      var data = JSON.parse(
+        JSON.stringify(props.data.collection().eventList())
+      ).filter(function (d) {
+        console.log("d.time=", d["time"], "time=", time);
+        if (d["time"] === time) {
+          console.log("TRUE");
+          return d["time"];
+        }
+      });
+    }
   };
 
   const getMin = (data) => {
@@ -61,28 +53,47 @@ function ExplorerChart(props) {
     return min;
   };
 
-  const f = format("$,.2f");
-  const range = state.timerange;
-  let AAPL;
-  if (state.tracker) {
-    const index = props.data.bisect(state.tracker);
-    const trackerEvent = props.data.at(index);
-    AAPL = `${f(trackerEvent.get("AAPL"))}`;
-  }
+  const handleTrackerChanged = (t, scale) => {
+    if (t != null) {
+      setTracker(t);
+      setTrackerEventIn(t && props.data.at(props.data.bisect(t)));
+      setTrackerX(t && scale(t));
+      props.onTrackerChanged(trackerEventIn, trackerX);
+    }
+  };
+
+  const dateStyle = {
+    fontSize: 12,
+    color: "#AAA",
+    borderWidth: 1,
+    borderColor: "#F4F4F4",
+  };
+
+  const markerStyle = {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    color: "#AAA",
+    marginLeft: "5px",
+  };
+
+  const formatter = format(".4s");
+  const trackerStyle = {
+    line: {
+      stroke: "#a62011",
+      cursor: "crosshair",
+      pointerEvents: "none",
+    },
+  };
 
   return (
     <ChartContainer
-      timeRange={range}
-      hideWeekends={true}
-      enablePanZoom={true}
-      trackerPosition={state.tracker}
-      onTrackerChanged={handleTrackerChanged}
+      timeRange={props.data.range()}
+      trackerPosition={tracker}
+      trackerStyle={trackerStyle}
       trackerInfoHeight={50}
-      timeAxisStyle={{ axis: { fill: "none", stroke: "none" } }}
+      hideWeekends={true}
       onTrackerChanged={handleTrackerChanged}
+      timeAxisStyle={{ axis: { fill: "none", stroke: "none" } }}
       enablePanZoom={true}
-      onTimeRangeChanged={handleTimeRangeChange}
-      onMouseMove={(x, y) => handleMouseMove(x, y)}
     >
       <ChartRow height={560}>
         <Charts>

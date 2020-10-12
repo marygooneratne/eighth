@@ -88,7 +88,6 @@ export const ExplorerForm = () => {
         style={{
           display: "flex",
           flexDirection: "row",
-          width: "100%",
           justifyContent: "space-between",
           flex: 1,
         }}

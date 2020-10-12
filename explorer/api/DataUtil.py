@@ -9,11 +9,13 @@ class DataUtil:
         self.gen = {}
     
     def gen_series(self, name, col):
+        print("THE COLUMN", col)
         try:
             df = pd.read_csv('data/' + name + '.csv')
             df['date'] = pd.to_datetime(df.date)
             srs = df.groupby(df.date)[col].mean().sort_index()
-
+            print(srs)
+            print('HELLO')
             return srs
         except Exception as e:
             print('Unable to generate pd.Series: ', e)
@@ -21,9 +23,10 @@ class DataUtil:
     
     
     def get_data(self, name, col, json=True):
-        if name not in self.gen:
-            self.gen[name] = self.gen_series(name, col)
+        full_name = name +"-"+ col
+        if full_name not in self.gen:
+            self.gen[full_name] = self.gen_series(name, col)
         if json:
-            return self.gen[name].to_json()
+            return self.gen[full_name].to_json()
         else:
-            return self.gen[name]
+            return self.gen[full_name]

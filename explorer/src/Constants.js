@@ -1,4 +1,37 @@
-export const INIT_STYLE = { key: "AAPL", color: "#d7faa0", width: 2 };
+export const INIT_STYLE = { key: "AAPL-close", color: "#d7faa0", width: 2 };
+export const DATASET_MAP = [
+  {
+    id: 0,
+    name: "SPX",
+    cols: ["open", "high", "low", "close", "adj", "close", "volume"],
+  },
+  {
+    id: 1,
+    name: "TSLA",
+    cols: ["open", "high", "low", "close", "adj", "close", "volume"],
+  },
+  {
+    id: 2,
+    name: "ZM",
+    cols: ["open", "high", "low", "close", "adj", "close", "volume"],
+  },
+  {
+    id: 3,
+    name: "UBER",
+    cols: ["open", "high", "low", "close", "adj", "close", "volume"],
+  },
+  {
+    id: 4,
+    name: "WORK",
+    cols: ["open", "high", "low", "close", "adj", "close", "volume"],
+  },
+  {
+    id: 5,
+    name: "Trump Approvals",
+    cols: ["close", "disapprove", "adjusted_approve", "adjusted_disapprove"],
+  },
+];
+
 export const COLORS = [
   "#FF6633",
   "#FFB399",

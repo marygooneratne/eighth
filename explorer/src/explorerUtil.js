@@ -8,6 +8,7 @@ export const initDataset = (name, columns, raw) => {
   dataset.name = name;
   dataset.columns = columns;
   dataset.events = raw;
+  console.log("the new set", dataset);
   return dataset;
 };
 
@@ -85,7 +86,7 @@ export const datasetOnLoad = () => {
     const timestamp = moment(new Date(item.date));
     raw[timestamp] = +item.close;
   });
-  return initDataset(name, columns, raw);
+  return initDataset(name + "-" + columns[1], columns, raw);
 };
 
 export const extractMoves = (events, percent, days) => {
@@ -104,4 +105,15 @@ export const extractMoves = (events, percent, days) => {
     }
   }
   return moves;
+};
+
+export const cardsDataOnLoad = (dataset) => {
+  console.log("dname", dataset.name);
+  let dName = dataset.name;
+  let copy = {};
+  let root = dName.split("-")[0];
+  let child = dName.split("-")[1];
+  copy[root] = {};
+  copy[root][child] = "0.0";
+  return copy;
 };
