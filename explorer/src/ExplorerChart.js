@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { format } from "d3-format";
 import moment from "moment";
+import { TimeRange } from "pondjs";
 
 function ExplorerChart(props) {
   console.log("data", JSON.stringify(props.data));
@@ -27,6 +28,11 @@ function ExplorerChart(props) {
     }
     return max;
   };
+
+  var fmt = "YYYY-MM-DD HH:mm";
+  var beginTime = moment("2020-08-01, 00:00", fmt);
+  var endTime = moment("2020-10-10, 00:00", fmt);
+  var range = new TimeRange(beginTime, endTime);
 
   const getTrackerValues = (time) => {
     if (props.data.collection().eventList() != null) {
@@ -86,11 +92,12 @@ function ExplorerChart(props) {
 
   return (
     <ChartContainer
+      hideWeekends={true}
       timeRange={props.data.range()}
+      // timeRange={range} // change
       trackerPosition={tracker}
       trackerStyle={trackerStyle}
       trackerInfoHeight={50}
-      hideWeekends={true}
       onTrackerChanged={handleTrackerChanged}
       timeAxisStyle={{ axis: { fill: "none", stroke: "none" } }}
       enablePanZoom={true}

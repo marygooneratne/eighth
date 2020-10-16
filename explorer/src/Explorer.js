@@ -11,6 +11,7 @@ import MoveForm from "./MoveForm.js";
 import DataCards from "./DataCards.js";
 import ExplorerChart from "./ExplorerChart.js";
 import SearchForm from "./SearchForm.js";
+import CreateForm from "./CreateForm.js";
 
 import {
   initDataset,
@@ -73,6 +74,7 @@ function Explorer() {
     copy.push(initDataset(name, columns, data));
     console.log("looking, ", JSON.stringify(copy));
     setDatasets(copy);
+    console.log("hippy", JSON.stringify(datasets));
     setSeries(buildTimeSeries(datasets));
     addToCardsData(name);
   }
@@ -97,7 +99,18 @@ function Explorer() {
       .then((data) => {
         const columns = ["date", column];
         const dName = name + "-" + column;
+        console.log("GOt da fucking data", data);
         updateSeries(dName, columns, transformDataset(data));
+      });
+  };
+
+  const createDataset = (handle) => {
+    console.log("making", String(handle));
+    fetch("/create/twitter/" + String(handle))
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Successfully created dataset");
+        console.log(data);
       });
   };
 
@@ -179,6 +192,7 @@ function Explorer() {
             onMoveFormFinish={onMoveFormFinish}
             formOptions={series.columns()}
           />
+          <CreateForm onSubmit={createDataset} />
         </div>
       </div>
     </div>

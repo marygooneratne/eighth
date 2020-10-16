@@ -12,21 +12,41 @@ export const initDataset = (name, columns, raw) => {
   return dataset;
 };
 
+Date.prototype.addDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+};
+
 export const buildPoints = (data) => {
   let points = [];
+  // var fmt = "YYYY-MM-DD HH:mm";
+  // var ts = new Date(Date.parse("2020-01-01, 00:00", fmt));
+  console.log("sweetie", JSON.stringify(data));
   for (let p = 0; p < Object.keys(data[0].events).length; p++) {
     let arr = [];
     let time = Object.keys(data[0].events)[p];
-    arr.push(time);
-    for (let d = 0; d < data.length; d++) {
-      let evts = data[d].events;
-      if (time in evts) {
-        arr.push(evts[time]);
-      } else {
-        arr.push(NaN);
+    var day = new Date(Date.parse(time)).getDay();
+    var isWeekend = day === 6 || day === 0;
+    console.log("isweek", day);
+    // let t1 = ts.addDays(p);
+    // let time = String(t1).split(" (")[0];
+    console.log("time", time);
+    if (!isWeekend) {
+      arr.push(time);
+      // console.log(arr);
+      for (let d = 0; d < data.length; d++) {
+        let evts = data[d].events;
+
+        console.log("fuck", d, Object.keys(evts));
+        if (time in evts) {
+          arr.push(evts[time]);
+        } else {
+          arr.push(NaN); //Change
+        }
       }
+      points.push(arr);
     }
-    points.push(arr);
   }
   return points;
 };
@@ -56,8 +76,8 @@ export const buildTimeEvents = (rawEvents, cols) => {
 export const buildTimeSeries = (data) => {
   let cols = buildCols(data);
   let rawEvents = buildPoints(data);
+  console.log("raw", rawEvents);
   let timeEvents = buildTimeEvents(rawEvents, cols);
-  console.log("columnsss, ", cols);
   return new TimeSeries({
     name: "data",
     columns: cols,
@@ -70,10 +90,11 @@ export const transformDataset = (resp) => {
   let raw = {};
   for (var key in dict) {
     if (dict.hasOwnProperty(key)) {
-      const timestamp = moment(new Date(parseInt(key)));
+      const timestamp = moment(new Date(parseInt(key)).setHours(0, 0, 0, 0));
       raw[timestamp] = +dict[key];
     }
   }
+  console.log("transformDataset", raw);
   return raw;
 };
 
@@ -83,7 +104,9 @@ export const datasetOnLoad = () => {
   const name = "AAPL";
   let raw = {};
   aapl.map((item) => {
-    const timestamp = moment(new Date(item.date));
+    console.log("item", item);
+    const timestamp = moment(new Date(Date.parse(item.date)));
+    console.log("&", item.date);
     raw[timestamp] = +item.close;
   });
   return initDataset(name + "-" + columns[1], columns, raw);

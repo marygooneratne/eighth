@@ -30,6 +30,21 @@ export const DATASET_MAP = [
     name: "Trump Approvals",
     cols: ["close", "disapprove", "adjusted_approve", "adjusted_disapprove"],
   },
+  {
+    id: 6,
+    name: "ElonMusk Tweets",
+    cols: ["polarity"],
+  },
+  {
+    id: 7,
+    name: "KanyeWest Tweets",
+    cols: ["polarity"],
+  },
+  {
+    id: 8,
+    name: "JoeBiden Tweets",
+    cols: ["polarity"],
+  },
 ];
 
 export const COLORS = [
