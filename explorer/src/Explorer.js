@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import "./App.css";
-import { Button, Card } from "antd";
+import { Button, Card, Divider } from "antd";
 import "antd/dist/antd.css";
 
 import { format } from "d3-format";
@@ -82,7 +82,7 @@ function Explorer() {
   function addLineColor(name) {
     let color = COLORS[Math.floor(Math.random() * COLORS.length)];
     var newList = styleList;
-    newList.push({ key: name, color: color, width: 2 });
+    newList.push({ key: name, color: color, width: 4 });
     setStyleList(newList);
     setStyle(styler(styleList));
   }
@@ -179,21 +179,25 @@ function Explorer() {
             onTrackerChanged={onTrackerChanged}
           />
         </div>
-        <div
+
+        <Card
+          size="small"
           style={{
-            justifyContent: "space-between",
+            marginBottom: "20",
             display: "flex",
             flexDirection: "column",
             width: "20%",
           }}
         >
           <SearchForm onSubmit={addDataset} />
+          <Divider />
           <MoveForm
             onMoveFormFinish={onMoveFormFinish}
             formOptions={series.columns()}
           />
+          <Divider />
           <CreateForm onSubmit={createDataset} />
-        </div>
+        </Card>
       </div>
     </div>
   );

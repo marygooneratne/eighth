@@ -21,27 +21,25 @@ function CreateForm(props) {
   };
 
   return (
-    <Card>
-      <Form ref={formRef} name="control-ref" onFinish={handleSubmit}>
-        <Form.Item
-          id="handle"
-          name="handle"
-          label="Handle"
-          rules={[{ required: true }]}
-        >
-          <Input
-            size={"large"}
-            placeholder="Twitter Handle"
-            onChange={onHandleChange}
-          />
-        </Form.Item>
-        <Form.Item>
-          <Button size={"large"} type="primary" htmlType="Add">
-            Create
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+    <Form ref={formRef} name="control-ref" onFinish={handleSubmit}>
+      <Form.Item
+        id="handle"
+        name="handle"
+        label="Handle"
+        rules={[{ required: true }]}
+      >
+        <Input
+          size={"large"}
+          placeholder="Twitter Handle"
+          onChange={onHandleChange}
+        />
+      </Form.Item>
+      <Form.Item>
+        <Button size={"large"} type="primary" htmlType="Add">
+          Create
+        </Button>
+      </Form.Item>
+    </Form>
   );
 }
 

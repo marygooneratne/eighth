@@ -50,55 +50,53 @@ function SearchForm(props) {
   };
 
   return (
-    <Card>
-      <Form ref={formRef} name="control-ref" onFinish={handleSubmit}>
-        <Form.Item name="dataset" label="Dataset" rules={[{ required: true }]}>
-          <Select
-            size={"large"}
-            showSearch
-            placeholder="Select dataset"
-            optionFilterProp="children"
-            onChange={onChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onSearch={onSearch}
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {DATASET_MAP.map((d) => {
-              return <Option value={d.id}>{d.name}</Option>;
-            })}
-          </Select>
-        </Form.Item>
+    <Form ref={formRef} name="control-ref" onFinish={handleSubmit}>
+      <Form.Item name="dataset" label="Dataset" rules={[{ required: true }]}>
+        <Select
+          size={"large"}
+          showSearch
+          placeholder="Select dataset"
+          optionFilterProp="children"
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onSearch={onSearch}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {DATASET_MAP.map((d) => {
+            return <Option value={d.id}>{d.name}</Option>;
+          })}
+        </Select>
+      </Form.Item>
 
-        <Form.Item name="column" label="Column" rules={[{ required: true }]}>
-          <Select
-            size={"large"}
-            showSearch
-            placeholder="Select column"
-            optionFilterProp="children"
-            onChange={onColumnChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onSearch={onSearch}
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {renderCols().map((c) => {
-              return <Option value={c}>{c}</Option>;
-            })}
-            ;
-          </Select>
-        </Form.Item>
-        <Form.Item>
-          <Button size={"large"} type="primary" htmlType="Add">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+      <Form.Item name="column" label="Column" rules={[{ required: true }]}>
+        <Select
+          size={"large"}
+          showSearch
+          placeholder="Select column"
+          optionFilterProp="children"
+          onChange={onColumnChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onSearch={onSearch}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {renderCols().map((c) => {
+            return <Option value={c}>{c}</Option>;
+          })}
+          ;
+        </Select>
+      </Form.Item>
+      <Form.Item>
+        <Button size={"large"} type="primary" htmlType="Add">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
   );
 }
 

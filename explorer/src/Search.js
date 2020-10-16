@@ -35,7 +35,7 @@ function Search(props) {
   };
 
   return (
-    <Card style={{ height: "100%">
+    <Card size="small">
       <Form ref={formRef} name="control-ref" onFinish={handleSubmit}>
         <Form.Item
           name="dataset"

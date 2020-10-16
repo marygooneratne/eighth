@@ -102,7 +102,7 @@ function ExplorerChart(props) {
       timeAxisStyle={{ axis: { fill: "none", stroke: "none" } }}
       enablePanZoom={true}
     >
-      <ChartRow height={560}>
+      <ChartRow height={600}>
         <Charts>
           <LineChart
             axis="y"

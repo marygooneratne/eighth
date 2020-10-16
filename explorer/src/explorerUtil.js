@@ -17,6 +17,7 @@ Date.prototype.addDays = function (days) {
   date.setDate(date.getDate() + days);
   return date;
 };
+var momtz = require("moment-timezone");
 
 export const buildPoints = (data) => {
   let points = [];
@@ -42,6 +43,7 @@ export const buildPoints = (data) => {
         if (time in evts) {
           arr.push(evts[time]);
         } else {
+          console.log("Looking for, ", time);
           arr.push(NaN); //Change
         }
       }
@@ -90,8 +92,18 @@ export const transformDataset = (resp) => {
   let raw = {};
   for (var key in dict) {
     if (dict.hasOwnProperty(key)) {
-      const timestamp = moment(new Date(parseInt(key)).setHours(0, 0, 0, 0));
-      raw[timestamp] = +dict[key];
+      const timestamp = moment(new Date(parseInt(key)))
+        .utcOffset("-0400")
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+      // const timestamp = momtz.tz(new Date(parseInt(key)), "US / Central");
+      const t2 = moment(
+        momtz.tz(new Date(parseInt(key)).addDays(1), "US / Central")
+      )
+        .utcOffset("-0400")
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
+      console.log("sexy", JSON.stringify(t2), JSON.stringify(timestamp));
+      raw[t2] = +dict[key];
     }
   }
   console.log("transformDataset", raw);
@@ -105,7 +117,7 @@ export const datasetOnLoad = () => {
   let raw = {};
   aapl.map((item) => {
     console.log("item", item);
-    const timestamp = moment(new Date(Date.parse(item.date)));
+    const timestamp = moment(new Date(item.date));
     console.log("&", item.date);
     raw[timestamp] = +item.close;
   });

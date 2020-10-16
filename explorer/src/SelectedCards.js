@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { Card } from "antd";
+import { Card, Space } from "antd";
 import "antd/dist/antd.css";
 
 function SelectedCards(props) {
@@ -24,17 +24,20 @@ function SelectedCards(props) {
         display: "flex",
         flexDirection: "column",
         paddingBottom: "20",
+        marginBottom: "20",
       }}
     >
-      {selected_keys.map((key) => {
-        return (
-          <Card size="small" title={key}>
-            {selected[key].map((val) => {
-              return <p>{val}</p>;
-            })}
-          </Card>
-        );
-      })}
+      <Space direction="vertical">
+        {selected_keys.map((key) => {
+          return (
+            <Card size="small" title={key}>
+              {selected[key].map((val) => {
+                return <p>{val}</p>;
+              })}
+            </Card>
+          );
+        })}
+      </Space>
     </div>
   );
 }
